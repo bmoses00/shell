@@ -6,6 +6,7 @@
 # include <sys/types.h>
 # include <errno.h>
 # include <unistd.h>
+# include <time.h>
 
 char ** parse_args(char * line) {
 	char ** args = calloc(48, 1);
@@ -19,31 +20,38 @@ char ** parse_args(char * line) {
 }
 
 int main(int argc, char * argv[]) {
-  if (argv[1] != NULL) {
-    char ** args = parse_args(argv[1]);
-  	int i;
-  	execvp(args[0], args);
-  }
-  else {
-    return 1;
-  }
+	char buffer[100];
+	char ** args;
+	// if (argv[1] != NULL) {
+	//   char ** args = parse_args(argv[1]);
+	// 	int i;
+	// 	execvp(args[0], args);
+	// }
+	printf("$ ");
+	fgets(buffer, 256, stdin);
+	// printf("%s\n", buffer );
+	args = parse_args(buffer);
+	int i;
+	for(i = 0; args[i] != NULL; i++){
+		printf("args of %d is %s\n", i, args[i]);
+	}
+	execvp(args[1], args);
+	// buffer[strlen(dir_to_scan) - 1] = 0;
 }
 
 
 
 
 char * strtype(int type);
-
-int main(int argc, char * argv[]) {
-  char dir_to_scan[256];
-  if (argv[1] == NULL) {
-    printf("Please enter a directory to scan: \n");
-    fgets(dir_to_scan, 256, stdin);
-    dir_to_scan[strlen(dir_to_scan) - 1] = 0;
-  }
-  else {
-    strcpy(dir_to_scan, argv[1]);
-  }
-  DIR * dir = opendir(dir_to_scan);
-
-}
+//
+// int main(int argc, char * argv[]) {
+//   char dir_to_scan[256];
+//   if (argv[1] == NULL) {
+//
+//   }
+//   else {
+//     strcpy(dir_to_scan, argv[1]);
+//   }
+//   DIR * dir = opendir(dir_to_scan);
+//
+// }
