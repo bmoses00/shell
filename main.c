@@ -26,45 +26,27 @@ char *** parse_comms(char * line){
 }
 
 int main(int argc, char * argv[]) {
-	char buffer[100];
+	char buffer[100], s[100];
 	char ** args;
-	char s[100];
-	int f;
+	int f, w;
 	printf("%s# ", getcwd(s, 100));
-	int w;
-	while(1){
+	
+	while (1) {
+		// take user input
 		fgets(buffer, 100, stdin);
 		buffer[strlen(buffer)-1] = 0;
 		args = parse_args(buffer);
-		if (strcmp(args[0], "cd") == 0){
-			chdir(args[1]);
-		}
-		f = fork();
-		if (f == 0){
-			execvp(args[0], args);
-		}
+		// special handling for cd and exit
+		if (strcmp(args[0], "exit") == 0) return 0;
+		if (strcmp(args[0],  "cd" ) == 0) chdir(args[1]);
+		else {
+			// forking and executing commands
+			f = fork();
+			if (f == 0)
+				execvp(args[0], args);
+	  }
 		wait(&w);
 		printf("%s# ", getcwd(s, 100));
-
-		// else exit(0);
 	}
-	return 0;
-	// buffer[strlen(dir_to_scan) - 1] = 0;
+
 }
-
-
-
-
-char * strtype(int type);
-//
-// int main(int argc, char * argv[]) {
-//   char dir_to_scan[256];
-//   if (argv[1] == NULL) {
-//
-//   }
-//   else {
-//     strcpy(dir_to_scan, argv[1]);
-//   }
-//   DIR * dir = opendir(dir_to_scan);
-//
-// }
