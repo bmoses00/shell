@@ -7,6 +7,7 @@
 # include <errno.h>
 # include <unistd.h>
 # include <time.h>
+# include <sys/wait.h>
 
 char ** parse_args(char * line) {
 	char ** args = calloc(48, 1);
@@ -19,23 +20,35 @@ char ** parse_args(char * line) {
 	return args;
 }
 
+char *** parse_comms(char * line){
+	char *** comms = calloc(100, 1);
+	int i;
+}
+
 int main(int argc, char * argv[]) {
 	char buffer[100];
 	char ** args;
-	// if (argv[1] != NULL) {
-	//   char ** args = parse_args(argv[1]);
-	// 	int i;
-	// 	execvp(args[0], args);
-	// }
-	printf("$ ");
-	fgets(buffer, 256, stdin);
-	// printf("%s\n", buffer );
-	args = parse_args(buffer);
-	int i;
-	for(i = 0; args[i] != NULL; i++){
-		printf("args of %d is %s\n", i, args[i]);
+	char s[100];
+	int f;
+	printf("%s# ", getcwd(s, 100));
+	int w;
+	while(1){
+		fgets(buffer, 100, stdin);
+		buffer[strlen(buffer)-1] = 0;
+		args = parse_args(buffer);
+		if (strcmp(args[0], "cd") == 0){
+			chdir(args[1]);
+		}
+		f = fork();
+		if (f == 0){
+			execvp(args[0], args);
+		}
+		wait(&w);
+		printf("%s# ", getcwd(s, 100));
+
+		// else exit(0);
 	}
-	execvp(args[1], args);
+	return 0;
 	// buffer[strlen(dir_to_scan) - 1] = 0;
 }
 
