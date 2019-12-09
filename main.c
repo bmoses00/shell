@@ -75,6 +75,25 @@ int main(int argc, char * argv[]) {
 				dup2(temp_stdout_fileno, 1);
 
 			}
+			else if (strchr(commands[i], 60) != NULL) {
+				test = parse_args(commands[i], "<");
+				args = parse_args(remove_spaces(test[0]), " ");
+				char * file_name = remove_spaces(test[1]);
+
+				fd = open(file_name, O_RDONLY);
+
+				temp_stdout_fileno = dup(0);
+				dup2(fd, 0);
+
+				fork_status = fork();
+				if (fork_status == 0) {
+					error = execvp(args[0], args);
+					if (error == -1) return 0;
+				}
+
+				dup2(temp_stdout_fileno, 0);
+
+			}
 			else {
 				// special handling for cd and exit
 				if (strcmp(args[0], "exit") == 0) {
