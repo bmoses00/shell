@@ -10,26 +10,24 @@
 int main() {
 	// desired pathing: 
 	
-	// stdin     stdout      stdin     stdout
-	// -- --> ls -- -->  foo -- --> wc -- --> terminal
+	// stdin     stdout        stdin     stdout
+	// -- --> ls -- -->  PIPE! -- --> wc -- --> terminal
 	
-	// creating our intermediary file, foo
-  char * file_name = "foo";
-  int fd = open(file_name, O_CREAT|O_EXCL|O_RDWR, 0755);
-  if (fd == -1) {
-    fd = open(file_name, O_RDWR);
-  }
+	
+  // creating the pipe
+  int mypipe[2];
+  pipe(mypipe);
+  int fd = mypipe[1];
 
 	// forking to perform 'ls'
   int f = fork();
-  
+  printf("My PID is: %d, and I am %d\n", getpid(), f);
   // crafting 'ls' command
   char * command[8];
   command[0] = "ls";
   command[1] = NULL;
   
-  // changing stdout of child process to foo. Output of 'ls' will now write to foo.
-  // then, execvp 'ls'.
+  // changing stdout of child process to input of pipe
 	if (f == 0) {
 		int stdout_fileno = 1;
   	int temp_stdout_fileno = dup(stdout_fileno);
@@ -41,19 +39,17 @@ int main() {
   int w;
   wait(&w);
   
-  // move foo's cursor to beginning of file
-  lseek(fd, 0, SEEK_SET);
-  
   // creating child process to run 'tr'
   f = fork();
-  
+  printf("My PID is: %d, and I am %d\n", getpid(), f);
   // crafting 'tr' command
   command[0] = "tr";
   command[1] = "a-z";
   command[2] = "A-Z";
   command[3] = NULL;
   
-  // changing stdin of 'tr' to foo
+  fd = mypipe[0];
+  // changing stdin of 'tr' to output of pipe
   if (f == 0) {
     int stdin_fileno = 0;
   	int temp_stdin_fileno = dup(stdin_fileno);
@@ -61,8 +57,6 @@ int main() {
   	execvp(command[0], command);
   }
   
-  // wait for child process to finish, then exit the program
   wait(&w);
   return 0;
-  
 }
