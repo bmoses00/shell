@@ -9,6 +9,8 @@
 # include <sys/types.h>
 # include <sys/stat.h>
 
+// ADD FREEING, CLOSING FILES, IMPROVE DUPING (LESS)
+
 char ** parse_args(char * line, char * delimiter) {
 	char * buff = calloc(100, 1);
 	strcpy(buff, line);
@@ -37,7 +39,8 @@ int main(int argc, char * argv[]) {
 	char buffer[100], s[100];
 	char ** args;
 	char ** commands;
-	char ** test;
+	char ** test; // rename later! (used to store parsed args for > and <)
+	char ** rename_later; // used for piping, rename later
 	int fork_status, wait_status, error, temp_stdout_fileno, fd;
 	printf("%s# ", getcwd(s, 100));
 
@@ -94,6 +97,22 @@ int main(int argc, char * argv[]) {
 				dup2(temp_stdout_fileno, 0);
 
 			}
+			else if (strchr(commands[i], 124) != NULL) {
+				rename_later = parse_args(commands[i], "|");
+				char ** first_command = parse_args(remove_spaces(rename_later[0]), " ");
+				char ** second_command = parse_args(remove_spaces(rename_later[1]), " ");
+				
+				int iter;
+				for (iter = 0; first_command[iter] != NULL; iter++) {
+					printf("(First command) %s\n", first_command[iter]);
+				}
+				
+				int mypipe[2];
+				pipe(mypipe[2]);
+				
+				
+			}
+			
 			else {
 				// special handling for cd and exit
 				if (strcmp(args[0], "exit") == 0) {
@@ -109,7 +128,7 @@ int main(int argc, char * argv[]) {
 						error = execvp(args[0], args);
 						if (error == -1) return 0;
 					}
-			  }
+			    }
 			}
 			wait(&wait_status);
 		}

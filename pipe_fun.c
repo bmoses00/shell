@@ -17,7 +17,6 @@ int main() {
   // creating the pipe
   int mypipe[2];
   pipe(mypipe);
-  int fd = mypipe[1];
 
 	// forking to perform 'ls'
   int f = fork();
@@ -28,10 +27,8 @@ int main() {
   command[1] = NULL;
   
   // changing stdout of child process to input of pipe
-	if (f == 0) {
-		int stdout_fileno = 1;
-  	int temp_stdout_fileno = dup(stdout_fileno);
-  	dup2(fd, stdout_fileno);
+  if (f == 0) {	
+  	dup2(mypipe[1], 1);
   	execvp(command[0], command);
   }
   
@@ -48,15 +45,15 @@ int main() {
   command[2] = "A-Z";
   command[3] = NULL;
   
-  fd = mypipe[0];
   // changing stdin of 'tr' to output of pipe
   if (f == 0) {
-    int stdin_fileno = 0;
-  	int temp_stdin_fileno = dup(stdin_fileno);
-  	dup2(fd, stdin_fileno);
+  	dup2(mypipe[0], 0);
+	close(mypipe[1]);
   	execvp(command[0], command);
   }
   
+  close(mypipe[0]);
+  close(mypipe[1]);
   wait(&w);
   return 0;
 }
