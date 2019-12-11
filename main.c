@@ -102,15 +102,31 @@ int main(int argc, char * argv[]) {
 				char ** first_command = parse_args(remove_spaces(rename_later[0]), " ");
 				char ** second_command = parse_args(remove_spaces(rename_later[1]), " ");
 				
-				int iter;
-				for (iter = 0; first_command[iter] != NULL; iter++) {
-					printf("(First command) %s\n", first_command[iter]);
+				int mypipe[2];
+				pipe(mypipe);
+
+				
+				int f = fork();
+				
+				if (f == 0) {
+				  dup2(mypipe[1], 1);
+  				execvp(first_command[0], first_command);
 				}
 				
-				int mypipe[2];
-				pipe(mypipe[2]);
+				int w;
+				wait(&w);
 				
+				f = fork();
 				
+				if (f == 0) {
+  				dup2(mypipe[0], 0);
+					close(mypipe[1]);
+  				execvp(second_command[0], second_command);
+  			}
+  
+  			close(mypipe[0]);
+  			close(mypipe[1]);
+  			wait(&w);
 			}
 			
 			else {
