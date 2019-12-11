@@ -9,7 +9,7 @@
 # include <sys/types.h>
 # include <sys/stat.h>
 
-// ADD FREEING, CLOSING FILES, IMPROVE DUPING (LESS)
+// ADD FREEING, CLOSING FILES
 
 char ** parse_args(char * line, char * delimiter) {
 	char * buff = calloc(100, 1);
@@ -35,21 +35,39 @@ char * remove_spaces(char * input) {
 	return input;
 }
 
+
+
+
 int main(int argc, char * argv[]) {
-	char buffer[100], s[100];
+	// buffer used for fgets, terminal_prompt used in getcwd() to print current directory
+	char buffer[100], terminal_prompt[100]; 
+	/* args used to store arguments
+     ex. (with input ls -a -l)
+	     args[0] = ls
+	     args[1] = -a 
+	     args[2] = -l */
 	char ** args;
+	/* commands used to store list of commands separated by semicolons
+	   ex. (with input ls -a; echo hi;)
+	       commands[0] = ls -a
+	       commands[1] = echo hi */
 	char ** commands;
+	
 	char ** test; // rename later! (used to store parsed args for > and <)
-	char ** rename_later; // used for piping, rename later
-	int fork_status, wait_status, error, temp_stdout_fileno, fd;
-	printf("%s# ", getcwd(s, 100));
+	
+	// f for checking fork(), w for inputting into wait()
+	int f, w, error, fd;
+	
+	// prints current directory
+	printf("%s# ", getcwd(terminal_prompt, 100));
 
 	while (1) {
 		// take user input
 		fgets(buffer, 100, stdin);
+		// setting last char in buffer to null
 		buffer[strlen(buffer) - 1] = 0;
-		// commands is now an array of Strings. Each String is a command, ex ls -l.
 		commands = parse_args(buffer, ";");
+		// looping through each of the commands to execute them sequentially
 		int i;
 		for (i = 0 ; commands[i] != NULL; i++) {
 			commands[i] = remove_spaces(commands[i]);
@@ -66,18 +84,15 @@ int main(int argc, char * argv[]) {
 					fd = open(file_name, O_WRONLY);
 				}
 
-				temp_stdout_fileno = dup(1);
-				dup2(fd, 1);
-
-				fork_status = fork();
-				if (fork_status == 0) {
+				f = fork();
+				if (f == 0) {
+				  dup2(fd, 1);
 					error = execvp(args[0], args);
 					if (error == -1) return 0;
 				}
 
-				dup2(temp_stdout_fileno, 1);
-
 			}
+			// 60 is ASCII char for '<'
 			else if (strchr(commands[i], 60) != NULL) {
 				test = parse_args(commands[i], "<");
 				args = parse_args(remove_spaces(test[0]), " ");
@@ -85,29 +100,24 @@ int main(int argc, char * argv[]) {
 
 				fd = open(file_name, O_RDONLY);
 
-				temp_stdout_fileno = dup(0);
-				dup2(fd, 0);
-
-				fork_status = fork();
-				if (fork_status == 0) {
+				f = fork();
+				if (f == 0) {
+					dup2(fd, 0);
 					error = execvp(args[0], args);
 					if (error == -1) return 0;
 				}
 
-				dup2(temp_stdout_fileno, 0);
-
 			}
+			// 124 is ASCII char for '|'
 			else if (strchr(commands[i], 124) != NULL) {
-				rename_later = parse_args(commands[i], "|");
-				char ** first_command = parse_args(remove_spaces(rename_later[0]), " ");
-				char ** second_command = parse_args(remove_spaces(rename_later[1]), " ");
+				test = parse_args(commands[i], "|");
+				char ** first_command = parse_args(remove_spaces(test[0]), " ");
+				char ** second_command = parse_args(remove_spaces(test[1]), " ");
 				
 				int mypipe[2];
 				pipe(mypipe);
-
 				
 				int f = fork();
-				
 				if (f == 0) {
 				  dup2(mypipe[1], 1);
   				execvp(first_command[0], first_command);
@@ -117,7 +127,6 @@ int main(int argc, char * argv[]) {
 				wait(&w);
 				
 				f = fork();
-				
 				if (f == 0) {
   				dup2(mypipe[0], 0);
 					close(mypipe[1]);
@@ -139,15 +148,16 @@ int main(int argc, char * argv[]) {
 				}
 				else {
 					// forking and executing commands
-					fork_status = fork();
-					if (fork_status == 0) {
+					f = fork();
+					if (f == 0) {
 						error = execvp(args[0], args);
 						if (error == -1) return 0;
 					}
 			    }
 			}
-			wait(&wait_status);
+			wait(&w);
 		}
-		printf("%s# ", getcwd(s, 100));
+		printf("%s# ", getcwd(terminal_prompt, 100));
 	}
 }
+
