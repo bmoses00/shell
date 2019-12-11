@@ -9,8 +9,6 @@
 # include <sys/types.h>
 # include <sys/stat.h>
 
-// ADD FREEING, CLOSING FILES
-
 char ** parse_args(char * line, char * delimiter) {
 	char * buff = calloc(100, 1);
 	strcpy(buff, line);
@@ -35,28 +33,85 @@ char * remove_spaces(char * input) {
 	return input;
 }
 
+void run_out_redirect_command(char * command) {
+	char ** commands = parse_args(command, ">");
+	char ** args = parse_args(remove_spaces(commands[0]), " ");
+	char * file_name = remove_spaces(commands[1]);
 
+	int fd = open(file_name, O_CREAT|O_EXCL|O_WRONLY|O_TRUNC, 0755);
+	if (fd == -1) {
+		fd = open(file_name, O_WRONLY|O_TRUNC);
+	}
+
+	if (fork() == 0) {
+		dup2(fd, STDOUT_FILENO);
+		// if execvp errors and cannot run
+		if (execvp(args[0], args) == -1) 
+			exit(-1);
+	}
+	close(fd);
+}
+
+void run_in_redirect_command(char * command) {
+  char ** commands = parse_args(command, "<");
+	char ** args = parse_args(remove_spaces(commands[0]), " ");
+	char * file_name = remove_spaces(commands[1]);
+
+	int fd = open(file_name, O_RDONLY);
+
+	if (fork() == 0) {
+		dup2(fd, STDIN_FILENO);
+		if (execvp(args[0], args) == -1) 
+			exit(-1);
+	}
+	close(fd);
+}
+
+void run_pipe_command(char * command) {
+	char ** commands = parse_args(command, "|");
+	char ** first_command = parse_args(remove_spaces(commands[0]), " ");
+	char ** second_command = parse_args(remove_spaces(commands[1]), " ");
+	
+	int mypipe[2];
+	pipe(mypipe);
+	
+	if (fork() == 0) {
+	  dup2(mypipe[1], STDOUT_FILENO);
+		if (execvp(first_command[0], first_command) == -1)
+			exit(-1);
+	}
+	
+	int w;
+	wait(&w);
+	
+	if (fork() == 0) {
+		dup2(mypipe[0], STDIN_FILENO);
+		close(mypipe[1]);
+		if (execvp(second_command[0], second_command) == -1)
+			exit(-1);
+	}
+
+	close(mypipe[0]);
+	close(mypipe[1]);
+	wait(&w);
+}
 
 
 int main(int argc, char * argv[]) {
 	// buffer used for fgets, terminal_prompt used in getcwd() to print current directory
 	char buffer[100], terminal_prompt[100]; 
 	/* args used to store arguments
-     ex. (with input ls -a -l)
+     ex. (with input ls -a)
 	     args[0] = ls
-	     args[1] = -a 
-	     args[2] = -l */
+	     args[1] = -a */
 	char ** args;
 	/* commands used to store list of commands separated by semicolons
 	   ex. (with input ls -a; echo hi;)
 	       commands[0] = ls -a
 	       commands[1] = echo hi */
 	char ** commands;
-	
-	char ** test; // rename later! (used to store parsed args for > and <)
-	
-	// f for checking fork(), w for inputting into wait()
-	int f, w, error, fd;
+	// w for inputting into wait()
+	int w, error, fd;
 	
 	// prints current directory
 	printf("%s# ", getcwd(terminal_prompt, 100));
@@ -71,74 +126,24 @@ int main(int argc, char * argv[]) {
 		int i;
 		for (i = 0 ; commands[i] != NULL; i++) {
 			commands[i] = remove_spaces(commands[i]);
-			args = parse_args(commands[i], " ");
-
+			
 			// 62 is ASCII char for '>'
 			if (strchr(commands[i], 62) != NULL) {
-				test = parse_args(commands[i], ">");
-				args = parse_args(remove_spaces(test[0]), " ");
-				char * file_name = remove_spaces(test[1]);
-
-				fd = open(file_name, O_CREAT|O_EXCL|O_WRONLY, 0755);
-				if (fd == -1) {
-					fd = open(file_name, O_WRONLY);
-				}
-
-				f = fork();
-				if (f == 0) {
-				  dup2(fd, 1);
-					error = execvp(args[0], args);
-					if (error == -1) return 0;
-				}
-
+				run_out_redirect_command(commands[i]);
 			}
+			
 			// 60 is ASCII char for '<'
 			else if (strchr(commands[i], 60) != NULL) {
-				test = parse_args(commands[i], "<");
-				args = parse_args(remove_spaces(test[0]), " ");
-				char * file_name = remove_spaces(test[1]);
-
-				fd = open(file_name, O_RDONLY);
-
-				f = fork();
-				if (f == 0) {
-					dup2(fd, 0);
-					error = execvp(args[0], args);
-					if (error == -1) return 0;
-				}
-
+				run_in_redirect_command(commands[i]);
 			}
+			
 			// 124 is ASCII char for '|'
 			else if (strchr(commands[i], 124) != NULL) {
-				test = parse_args(commands[i], "|");
-				char ** first_command = parse_args(remove_spaces(test[0]), " ");
-				char ** second_command = parse_args(remove_spaces(test[1]), " ");
-				
-				int mypipe[2];
-				pipe(mypipe);
-				
-				int f = fork();
-				if (f == 0) {
-				  dup2(mypipe[1], 1);
-  				execvp(first_command[0], first_command);
-				}
-				
-				int w;
-				wait(&w);
-				
-				f = fork();
-				if (f == 0) {
-  				dup2(mypipe[0], 0);
-					close(mypipe[1]);
-  				execvp(second_command[0], second_command);
-  			}
-  
-  			close(mypipe[0]);
-  			close(mypipe[1]);
-  			wait(&w);
+				run_pipe_command(commands[i]);
 			}
 			
 			else {
+			  args = parse_args(commands[i], " ");
 				// special handling for cd and exit
 				if (strcmp(args[0], "exit") == 0) {
 					return 0;
@@ -147,17 +152,14 @@ int main(int argc, char * argv[]) {
 					chdir(args[1]);
 				}
 				else {
-					// forking and executing commands
-					f = fork();
-					if (f == 0) {
-						error = execvp(args[0], args);
-						if (error == -1) return 0;
+					if (fork() == 0) {
+						if (execvp(args[0], args) == -1) 
+						  exit(-1);
 					}
-			    }
+			  }
 			}
 			wait(&w);
 		}
 		printf("%s# ", getcwd(terminal_prompt, 100));
 	}
 }
-
