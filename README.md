@@ -14,8 +14,8 @@ Attempted:
 	Putting two ;'s next to each other will stop the parser (for user's own good")
   Putting multiples spaces after a command will error
 	
-Files & Function Headers:
-parse.c
+Files & Function Headers: <br>
+parse.c <br>
 	Handles all line parsing fucntions
 	
 	/*======== int count_tokens() ==========
@@ -33,7 +33,7 @@ parse.c
 	Removes leading and trailing whitespace on the string line.
 	Terminating '\0' is placed at a new location if necessary.
 	====================*/
-executes.c  
+executes.c  <br>
   	Executes commands involving < > and |
 	
 	/*======== run_out_redirect_command(char * command) ==========
@@ -58,6 +58,6 @@ executes.c
 	====================*/
 
 
-main.c
+main.c <br>
 	Handles the forking an executing of commands
 	
