@@ -33,7 +33,8 @@ parse.c
 	Terminating '\0' is placed at a new location if necessary.
 	====================*/
 executes.c  
-  Executes commands involving < > and |
+  	Executes commands involving < > and |
+	
 	/*======== run_out_redirect_command(char * command) ==========
 	Inputs:  char *command
 	Returns: N/A
@@ -42,23 +43,20 @@ executes.c
 	====================*/
 
 	/*======== run_in_redirect_command(char * command)  ==========	
-  Inputs:  char *command
+  	Inputs:  char *command
 	Returns: N/A
 
 	Executes a command with forking if the command has "<"  
 	====================*/
 
 	/*======== run_pipe_command(char * command)  ==========
-	Inputs:  char *line 
-	Returns: Pointer to the beginning of line
-
-	Removes leading and trailing whitespace on the string line.
-	Terminating '\0' is placed at a new location if necessary.
+	Inputs:  char *command 
+	Returns: N/A
+	
+	Executes a command with forking if the command has "|"  
 	====================*/
 
 
-dwsh.c
-	Handles the forking an executing of commands...
-
-magical.c
-	UNOCORNS!	
+main.c
+	Handles the forking an executing of commands
+	
