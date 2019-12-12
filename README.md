@@ -17,12 +17,13 @@ Attempted:
 Files & Function Headers:
 parse.c
 	Handles all line parsing fucntions
+	
 	/*======== int count_tokens() ==========
 	Inputs:  char *line
         	  char delimiter  
 	Returns: a 2-D array refering to parsed args
   
-  Seperates a line into multiple commands 
+  	Seperates a line into multiple commands 
 	====================*/
 
 	/*======== char * remove_spaces(char * input) ==========
