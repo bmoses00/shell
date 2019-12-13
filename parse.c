@@ -9,7 +9,7 @@
 # include <sys/types.h>
 # include <sys/stat.h>
 # include "parse.h"
-# include "executes.h" 
+# include "executes.h"
 char ** parse_args(char * line, char * delimiter) {
 	char * buff = calloc(100, 1);
 	strcpy(buff, line);
