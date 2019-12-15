@@ -6,7 +6,7 @@ by Mohidul Abedin and Brian Moses
 	* Parses multiple commands on one line!
 	* Redirects using (> , <)!
 	* Double redirects!
-        * PIPESSSSS!
+	* PIPESSSSS!
 
 Attempted:
   We looked at tab and arrows, but there is no official C library to implement receiving data before enter key is pressed. 
@@ -60,5 +60,5 @@ executes.c  <br>
 
 
 main.c <br>
-	Handles the forking an executing of commands
+	Handles the forking and executing of commands
 	
