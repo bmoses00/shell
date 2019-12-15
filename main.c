@@ -90,8 +90,7 @@ int main(int argc, char * argv[]) {
 		}
 		// we only need to free commands[0] if there is a
 		// semicolon (if i > 0)
-		printf("%d\n", i);
-		if (i > 0) { 
+		if (i > 0) {
 			free(commands[0]);
 		}
 		free(commands);
