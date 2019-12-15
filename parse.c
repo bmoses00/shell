@@ -10,11 +10,12 @@
 # include <sys/stat.h>
 # include "parse.h"
 # include "executes.h"
+
 char ** parse_args(char * line, char * delimiter) {
-	char * buff = calloc(100, 1);
+	char * buff = calloc(420, 1);
 	strcpy(buff, line);
 
-	char ** args = calloc(100, 1);
+	char ** args = calloc(125, 1);
 	int i;
 	for (i = 0; buff != NULL; i++)
 		args[i] = strsep(&buff, delimiter);

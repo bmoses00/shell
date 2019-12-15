@@ -41,8 +41,12 @@ int main(int argc, char * argv[]) {
 		for (i = 0 ; commands[i] != NULL; i++) {
 			commands[i] = remove_spaces(commands[i]);
 
+		  if (strchr(commands[i], 62) != NULL
+						&& strchr(commands[i], 60) != NULL) {
+				run_in_out_redirect_command(commands[i]);
+			}
 			// 62 is ASCII char for '>'
-			if (strchr(commands[i], 62) != NULL) {
+			else if (strchr(commands[i], 62) != NULL) {
 				run_out_redirect_command(commands[i]);
 			}
 
@@ -60,20 +64,38 @@ int main(int argc, char * argv[]) {
 			  args = parse_args(commands[i], " ");
 				// special handling for cd and exit
 				if (strcmp(args[0], "exit") == 0) {
+
+					free(commands[0]);
+					free(commands);
+					free(args[0]);
+					free(args);
+
 					return 0;
 				}
 				if (strcmp(args[0],  "cd" ) == 0) {
 					chdir(args[1]);
+					free(args[0]);
+					free(args);
 				}
 				else {
 					if (fork() == 0) {
 						if (execvp(args[0], args) == -1)
 						  exit(-1);
 					}
+					free(args[0]);
+					free(args);
 			  }
 			}
 			wait(&w);
 		}
+		// we only need to free commands[0] if there is a
+		// semicolon (if i > 0)
+		printf("%d\n", i);
+		if (i > 0) { 
+			free(commands[0]);
+		}
+		free(commands);
+
 		printf("%s# ", getcwd(terminal_prompt, 100));
 	}
 }

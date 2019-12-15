@@ -10,6 +10,7 @@
 # include <sys/stat.h>
 # include "parse.h"
 # include "executes.h"
+
 void run_out_redirect_command(char * command) {
 	char ** commands = parse_args(command, ">");
 	char ** args = parse_args(remove_spaces(commands[0]), " ");
@@ -26,6 +27,11 @@ void run_out_redirect_command(char * command) {
 		if (execvp(args[0], args) == -1)
 			exit(-1);
 	}
+	free(commands[0]);
+	free(commands);
+	free(args[0]);
+	free(args);
+
 	close(fd);
 }
 
@@ -41,7 +47,36 @@ void run_in_redirect_command(char * command) {
 		if (execvp(args[0], args) == -1)
 			exit(-1);
 	}
+	free(commands[0]);
+	free(commands);
+	free(args[0]);
+	free(args);
+
 	close(fd);
+}
+
+void run_in_out_redirect_command(char * command) {
+	char ** commands = parse_args(command, "<>");
+	char ** args = parse_args(remove_spaces(commands[0]), " ");
+	char * file_name = remove_spaces(commands[1]);
+	char * file_name_2 = remove_spaces(commands[2]);
+
+	int fd = open(file_name, O_RDONLY);
+	int fd2 = open(file_name_2, O_WRONLY);
+	if (fork() == 0) {
+		dup2(fd, STDIN_FILENO);
+		dup2(fd2, STDOUT_FILENO);
+		if (execvp(args[0], args) == -1)
+			exit(-1);
+	}
+
+	free(commands[0]);
+	free(commands);
+	free(args[0]);
+	free(args);
+
+	close(fd);
+	close(fd2);
 }
 
 void run_pipe_command(char * command) {
@@ -67,6 +102,13 @@ void run_pipe_command(char * command) {
 		if (execvp(second_command[0], second_command) == -1)
 			exit(-1);
 	}
+
+	free(commands[0]);
+	free(commands);
+	free(first_command[0]);
+	free(first_command);
+	free(second_command[0]);
+	free(second_command);
 
 	close(mypipe[0]);
 	close(mypipe[1]);
