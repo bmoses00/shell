@@ -1,17 +1,17 @@
 # incepShell
 by Mohidul Abedin and Brian Moses
 
-Features:
+* Features:
 	* Forks and executes commands!
 	* Parses multiple commands on one line!
 	* Redirects using (> , <)!
-	* DOuble redirects!
+	* Double redirects!
         * PIPESSSSS!
 
 Attempted:
   We looked at tab and arrows, but there is no official C library to implement receiving data before enter key is pressed. 
 
-~~Bugs~~ Features (Continued):
+~~Bugs~~ Features (cont'd):
 	Putting two ;'s next to each other will stop the parser (for user's own good")
   Putting multiples spaces after a command will error
 	
