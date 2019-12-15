@@ -8,7 +8,7 @@ Features:
   PIPESSSSS
 
 Attempted:
-  We have no ambition
+  We looked at tab and arrows, but there is no official C library to implement receiving data before enter key is pressed. 
 
 ~~Bugs~~ Features (Continued):
 	Putting two ;'s next to each other will stop the parser (for user's own good")
