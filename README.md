@@ -2,10 +2,11 @@
 by Mohidul Abedin and Brian Moses
 
 Features:
-	Forks and executes commands!
-	Parses multiple commands on one line!
-	Redirects using (> , <)!
-  PIPESSSSS
+	* Forks and executes commands!
+	* Parses multiple commands on one line!
+	* Redirects using (> , <)!
+	* DOuble redirects!
+        * PIPESSSSS!
 
 Attempted:
   We looked at tab and arrows, but there is no official C library to implement receiving data before enter key is pressed. 
