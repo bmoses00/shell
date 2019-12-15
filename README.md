@@ -11,9 +11,9 @@ by Mohidul Abedin and Brian Moses
 Attempted:
   We looked at tab and arrows, but there is no official C library to implement receiving data before enter key is pressed. 
 
-~~Bugs~~ Features (cont'd):
-	Putting two ;'s next to each other will stop the parser (for user's own good")
-  Putting multiples spaces after a command will error
+* ~~Bugs~~ Features (cont'd):
+	* Putting two ;'s next to each other will stop the parser (for user's own good)
+	* Putting multiples spaces after a command will error
 	
 Files & Function Headers: <br>
 parse.c <br>
