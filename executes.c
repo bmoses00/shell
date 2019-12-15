@@ -62,7 +62,10 @@ void run_in_out_redirect_command(char * command) {
 	char * file_name_2 = remove_spaces(commands[2]);
 
 	int fd = open(file_name, O_RDONLY);
-	int fd2 = open(file_name_2, O_WRONLY);
+	int fd2 = open(file_name_2, O_CREAT|O_EXCL|O_WRONLY|O_TRUNC, 0755);
+        if (fd2 == -1) {
+                fd2 = open(file_name_2, O_WRONLY|O_TRUNC);
+        }
 	if (fork() == 0) {
 		dup2(fd, STDIN_FILENO);
 		dup2(fd2, STDOUT_FILENO);
