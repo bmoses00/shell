@@ -19,9 +19,9 @@ Files & Function Headers: <br>
 parse.c <br>
 	Handles all line parsing fucntions
 	
-	/*======== int count_tokens() ==========
-	Inputs:  char *line
-        	  char delimiter  
+	/*======== char ** parse_args() ==========
+	Inputs:  char * line
+        	 char * delimiter  
 	Returns: a 2-D array refering to parsed args
   
   	Seperates a line into multiple commands 
@@ -39,26 +39,33 @@ executes.c  <br>
 	
 	/*======== run_out_redirect_command(char * command) ==========
 	Inputs:  char *command
-	Returns: N/A
+	Returns: void
   
 	Executes a command with forking if the command has ">"  
 	====================*/
 
 	/*======== run_in_redirect_command(char * command)  ==========	
   	Inputs:  char *command
-	Returns: N/A
+	Returns: void
 
 	Executes a command with forking if the command has "<"  
 	====================*/
 
 	/*======== run_pipe_command(char * command)  ==========
 	Inputs:  char *command 
-	Returns: N/A
+	Returns: void
 	
 	Executes a command with forking if the command has "|"  
+	====================*/
+	
+	/*======== run_in_out_command(char * command)  ==========
+	Inputs:  char *command 
+	Returns: void
+	
+	Executes a command with forking if the command has "<" and ">"  
 	====================*/
 
 
 main.c <br>
-	Handles the forking and executing of commands
+	Calls functions in executes.c as necessary, or executes basic fork and exec if not
 	
