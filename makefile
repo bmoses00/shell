@@ -1,5 +1,5 @@
 ifeq ($(DEBUG), true)
-  CC = gcc -g
+  CC = gcc -g -c
 else
   CC = gcc -c
 endif
