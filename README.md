@@ -14,6 +14,7 @@ by Mohidul Abedin and Brian Moses
 * ~~Bugs~~ Features (cont'd):
 	* Putting two ;'s next to each other will stop the parser (for user's own good)
 	* Putting multiples spaces after a command will error
+	* Double redirecting with a non-existant INPUT file might explode your pc ("will create the output file like a good boi")
 	
 Files & Function Headers: <br>
 parse.c <br>
