@@ -64,8 +64,15 @@ executes.c  <br>
 	
 	Executes a command with forking if the command has "<" and ">"  
 	====================*/
+	
+	/*======== run_regular_command(char ** args)  ==========
+	Inputs:  char ** args
+	Returns: void
+	
+	Executes a command with forking if the command has none of the above symbols ("<", ">", or "|") 
+	====================*/
 
 
 main.c <br>
-	Calls functions in executes.c as necessary, or executes basic fork and exec if not
+	Calls functions in executes.c as necessary, and runs "exit" and "cd"
 	
