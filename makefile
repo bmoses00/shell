@@ -1,7 +1,7 @@
 ifeq ($(DEBUG), true)
   CC = gcc -g
 else
-  CC = gcc
+  CC = gcc -c
 endif
 
 all: main.o parse.o executes.o
