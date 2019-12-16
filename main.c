@@ -78,12 +78,7 @@ int main(int argc, char * argv[]) {
 					free(args);
 				}
 				else {
-					if (fork() == 0) {
-						if (execvp(args[0], args) == -1)
-						  exit(-1);
-					}
-					free(args[0]);
-					free(args);
+					run_regular_command(args);
 			  }
 			}
 			wait(&w);

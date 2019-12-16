@@ -117,3 +117,12 @@ void run_pipe_command(char * command) {
 	close(mypipe[1]);
 	wait(&w);
 }
+
+void run_regular_command(char ** args) {
+	if (fork() == 0) {
+		if (execvp(args[0], args) == -1)
+			exit(-1);
+	}
+	free(args[0]);
+	free(args);
+}
